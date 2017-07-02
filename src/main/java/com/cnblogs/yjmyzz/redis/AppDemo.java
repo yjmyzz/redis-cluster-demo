@@ -5,11 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisPool;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class AppDemo {
@@ -111,97 +106,117 @@ public class AppDemo {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         ApplicationContext ctx = new ClassPathXmlApplicationContext("spring-redis.xml");
 
         jc = ctx.getBean(JedisCluster.class);
 
-
-        Map<String, JedisPool> nodes = jc.getClusterNodes();
-        for (Map.Entry<String, JedisPool> entry : nodes.entrySet()) {
-            logger.info(entry.getKey() + " => " + entry.getValue().toString());
-            //清空所有数据
+        while (true) {
             try {
-                entry.getValue().getResource().flushDB();
+                System.out.println("aaa=" + jc.get("aaa"));
             } catch (Exception e) {
-                logger.info(e.getLocalizedMessage());//slave节点上执行flushDB会报错
+                System.out.println("aaa -> error");
             }
-            //entry.getValue().getResource().keys("*");//慎用,缓存数量较大时,会引起性能问题.
+            try {
+                System.out.println("bbb=" + jc.get("bbb"));
+            } catch (Exception e) {
+                System.out.println("bbb -> error");
+            }
+            try {
+                System.out.println("ccc=" + jc.get("ccc"));
+            } catch (Exception e) {
+                System.out.println("ccc -> error");
+            }
+            Thread.sleep(1000);
         }
 
-        //检测key是否存在
-        logger.info(jc.exists("a").toString());
 
-        //字符串写入测试
-        logger.info(set("a", "hello world!"));
-        logger.info(set("b", "hello redis!"));
-
-        //字符串读取测试
-        logger.info(jc.get("a"));
-
-        //set写入操作
-        logger.info("set写入测试 ==>");
-        logger.info(sadd("set1", "a", "b", "c") + "");
-
-        //缓存类型测试
-        logger.info(jc.type("set1"));
-
-        //set读取测试
-        logger.info("set读取测试 ==>");
-        Set<String> set1 = jc.smembers("set1");
-        for (String s : set1) {
-            logger.info(s);
-        }
-
-        //list写入测试
-        logger.info("list写入测试 ==>");
-        logger.info(lpush("list1", "1", "2", "3") + "");
-
-
-        //list读取测试
-        logger.info("list读取测试 ==>");
-        List<String> list1 = jc.lrange("list1", 0, 999);
-        for (String s : list1) {
-            logger.info(s);
-        }
-
-        //hash写入测试
-        logger.info("hash写入测试 ==>");
-        logger.info(hset("hash1", "jimmy", "杨俊明") + "");
-        logger.info(hset("hash1", "CN", "中国") + "");
-        logger.info(hset("hash1", "US", "美国") + "");
-
-        //hash读取测试
-        logger.info("hash读取测试 ==>");
-        Map<String, String> hash1 = jc.hgetAll("hash1");
-        for (Map.Entry<String, String> entry : hash1.entrySet()) {
-            logger.info(entry.getKey() + ":" + entry.getValue());
-        }
-
-        //zset写入测试
-        logger.info("zset写入测试 ==>");
-        logger.info(zadd("zset1", "3") + "");
-        logger.info(zadd("zset1", "2") + "");
-        logger.info(zadd("zset1", "1") + "");
-        logger.info(zadd("zset1", "4") + "");
-        logger.info(zadd("zset1", "5") + "");
-        logger.info(zadd("zset1", "6") + "");
-
-        //zset读取测试
-        logger.info("zset读取测试 ==>");
-        Set<String> zset1 = jc.zrange("zset1", 0, 999);
-        for (String s : zset1) {
-            logger.info(s);
-        }
-
-        //遍历所有缓存项的key
-        logger.info("遍历cluster中的所有key ==>");
-        logger.info(jc.smembers(KEYS_STRING).toString());
-        logger.info(jc.smembers(KEYS_HASH).toString());
-        logger.info(jc.smembers(KEYS_SET).toString());
-        logger.info(jc.smembers(KEYS_LIST).toString());
-        logger.info(jc.smembers(KEYS_ZSET).toString());
-
+//        Map<String, JedisPool> nodes = jc.getClusterNodes();
+//        for (Map.Entry<String, JedisPool> entry : nodes.entrySet()) {
+//            logger.info(entry.getKey() + " => " + entry.getValue().toString());
+//            //清空所有数据
+//            try {
+//                entry.getValue().getResource().flushDB();
+//            } catch (Exception e) {
+//                logger.info(e.getLocalizedMessage());//slave节点上执行flushDB会报错
+//            }
+//            //entry.getValue().getResource().keys("*");//慎用,缓存数量较大时,会引起性能问题.
+//        }
+//
+//        //检测key是否存在
+//        logger.info(jc.exists("a").toString());
+//
+//        //字符串写入测试
+//        logger.info(set("a", "hello world!"));
+//        logger.info(set("b", "hello redis!"));
+//
+//        //字符串读取测试
+//        logger.info(jc.get("a"));
+//
+//        //set写入操作
+//        logger.info("set写入测试 ==>");
+//        logger.info(sadd("set1", "a", "b", "c") + "");
+//
+//        //缓存类型测试
+//        logger.info(jc.type("set1"));
+//
+//        //set读取测试
+//        logger.info("set读取测试 ==>");
+//        Set<String> set1 = jc.smembers("set1");
+//        for (String s : set1) {
+//            logger.info(s);
+//        }
+//
+//        //list写入测试
+//        logger.info("list写入测试 ==>");
+//        logger.info(lpush("list1", "1", "2", "3") + "");
+//
+//
+//        //list读取测试
+//        logger.info("list读取测试 ==>");
+//        List<String> list1 = jc.lrange("list1", 0, 999);
+//        for (String s : list1) {
+//            logger.info(s);
+//        }
+//
+//        //hash写入测试
+//        logger.info("hash写入测试 ==>");
+//        logger.info(hset("hash1", "jimmy", "杨俊明") + "");
+//        logger.info(hset("hash1", "CN", "中国") + "");
+//        logger.info(hset("hash1", "US", "美国") + "");
+//
+//        //hash读取测试
+//        logger.info("hash读取测试 ==>");
+//        Map<String, String> hash1 = jc.hgetAll("hash1");
+//        for (Map.Entry<String, String> entry : hash1.entrySet()) {
+//            logger.info(entry.getKey() + ":" + entry.getValue());
+//        }
+//
+//        //zset写入测试
+//        logger.info("zset写入测试 ==>");
+//        logger.info(zadd("zset1", "3") + "");
+//        logger.info(zadd("zset1", "2") + "");
+//        logger.info(zadd("zset1", "1") + "");
+//        logger.info(zadd("zset1", "4") + "");
+//        logger.info(zadd("zset1", "5") + "");
+//        logger.info(zadd("zset1", "6") + "");
+//
+//        //zset读取测试
+//        logger.info("zset读取测试 ==>");
+//        Set<String> zset1 = jc.zrange("zset1", 0, 999);
+//        for (String s : zset1) {
+//            logger.info(s);
+//        }
+//
+//        //遍历所有缓存项的key
+//        logger.info("遍历cluster中的所有key ==>");
+//        logger.info(jc.smembers(KEYS_STRING).toString());
+//        logger.info(jc.smembers(KEYS_HASH).toString());
+//        logger.info(jc.smembers(KEYS_SET).toString());
+//        logger.info(jc.smembers(KEYS_LIST).toString());
+//        logger.info(jc.smembers(KEYS_ZSET).toString());
+//
+//    }
     }
 }
